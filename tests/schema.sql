@@ -19,6 +19,8 @@ CREATE TABLE bigints (field bigint(50) unsigned);
 INSERT INTO bigints VALUES (0);
 INSERT INTO bigints VALUES (NULL);
 INSERT INTO bigints VALUES (18446744073709551615);
+-- Check unique indexes are moved.
+CREATE UNIQUE INDEX unique_index ON bigints (field);
 
 -- Bits
 DROP TABLE IF EXISTS bitfield;
@@ -46,7 +48,11 @@ INSERT INTO textfield VALUES ('interesting field data.\t');
 -- Longblob
 DROP TABLE IF EXISTS blobfield;
 CREATE TABLE blobfield (field longblob);
-INSERT INTO blobfield VALUES (HEX('cat'));
+INSERT INTO blobfield VALUES ('cat');
+INSERT INTO blobfield VALUES (x'00');
+INSERT INTO blobfield VALUES (x'08');
+INSERT INTO blobfield VALUES (x'0A');
+INSERT INTO blobfield VALUES (x'0D');
 
 -- View with brackets
 DROP VIEW IF EXISTS badview;
