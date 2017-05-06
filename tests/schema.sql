@@ -43,6 +43,11 @@ INSERT INTO textfield VALUES ('interesting field data.');
 INSERT INTO textfield VALUES ('interesting field data.\n');
 INSERT INTO textfield VALUES ('interesting field data.\t');
 
+-- Longblob
+DROP TABLE IF EXISTS blobfield;
+CREATE TABLE blobfield (field longblob);
+INSERT INTO blobfield VALUES (HEX('cat'));
+
 -- View with brackets
 DROP VIEW IF EXISTS badview;
 CREATE VIEW badview AS SELECT c.field FROM dates a JOIN dates b ON (a.field=b.field) JOIN dates c

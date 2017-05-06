@@ -738,7 +738,7 @@ class FromMySqlToPostgreSql
                 stripos($arrColumn['Type'], 'blob') !== false
                 || stripos($arrColumn['Type'], 'binary') !== false
             ) {
-                $strRetVal .= 'HEX(`' . $arrColumn['Field'] . '`),';
+                $strRetVal .= 'UNHEX(`' . $arrColumn['Field'] . '`),';
             } elseif (
                 stripos($arrColumn['Type'], 'bit') !== false
             ) {
