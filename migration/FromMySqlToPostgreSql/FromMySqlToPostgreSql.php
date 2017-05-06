@@ -1159,8 +1159,8 @@ class FromMySqlToPostgreSql
                     $strColumnList    = '(' . implode(',', $arrIndex['column_name']) . ')';
                     $strCurrentAction = 'uniqueindex';
                     $sql              = 'ALTER TABLE "' . $this->strSchema . '"."' . $strTableName . '" ADD CONSTRAINT "'
-                                      . $strIndexName . " UNIQUE "'
-                                      . $strColumnList .";";
+                                      . $strIndexName . '" UNIQUE '
+                                      . $strColumnList . ";";
                 } else {
                     // "schema_idxname_{integer}_idx" - is NOT a mistake.
                     $strColumnName    = str_replace('"', '', $arrIndex['column_name'][0]) . $intCounter;
