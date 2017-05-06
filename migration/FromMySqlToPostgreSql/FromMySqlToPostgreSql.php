@@ -643,6 +643,7 @@ class FromMySqlToPostgreSql
      *
      * @param  string $strTableName
      * @param  string $strSelectFieldList
+     * @param  array  $arrColumns
      * @param  int    $intOffset
      * @param  int    $intRowsInChunk
      * @param  int    $intRowsCnt
@@ -651,6 +652,7 @@ class FromMySqlToPostgreSql
     private function populateTableData(
         $strTableName,
         $strSelectFieldList,
+        $arrColumns,
         $intRowsInChunk,
         $intRowsCnt
     ) {
@@ -676,9 +678,15 @@ class FromMySqlToPostgreSql
                 $arrSanitizedCsvData = [];
                 $copiedCount++;
 
+		$column = reset($arrColumns);
                 foreach ($arrRow as $value) {
+                    $column = next($arrColumns);
                     if (is_null($value)) {
                         $arrSanitizedCsvData[] = '\N';
+                    } else if (stripos($column['Type'], 'blob') !== false
+                               || stripos($column['Type'], 'binary') !== false) {
+                        // Binary types need \x for hex escaping and will receive hex from the MySQL query.
+                        $arraySanitizedCsvData[] = '\x'.$value;
                     } else if (mb_check_encoding($value, $this->strEncoding)) {
                         $arrSanitizedCsvData[] = $this->escapeValue($value);
                     } else {
@@ -734,11 +742,6 @@ class FromMySqlToPostgreSql
                 || stripos($arrColumn['Type'], 'polygon') !== false
             ) {
                 $strRetVal .= 'HEX(ST_AsWKB(`' . $arrColumn['Field'] . '`)),';
-            } elseif (
-                stripos($arrColumn['Type'], 'blob') !== false
-                || stripos($arrColumn['Type'], 'binary') !== false
-            ) {
-                $strRetVal .= 'UNHEX(`' . $arrColumn['Field'] . '`),';
             } elseif (
                 stripos($arrColumn['Type'], 'bit') !== false
             ) {
@@ -799,7 +802,7 @@ class FromMySqlToPostgreSql
             $stmt               = $this->mysql->query($sql);
             $arrColumns         = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             $strSelectFieldList = $this->arrangeColumnsData($arrColumns);
-            unset($sql, $stmt, $arrColumns);
+            unset($sql, $stmt);
             // End field list for SELECT from MySQL.
 
             $this->log(
@@ -810,6 +813,7 @@ class FromMySqlToPostgreSql
             $intRetVal = $this->populateTableData(
                 $strTableName,
                 $strSelectFieldList,
+                $arrColumns,
                 $intRowsInChunk,
                 $intRowsCnt
             );
